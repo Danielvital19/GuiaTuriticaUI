@@ -1,0 +1,23 @@
+version: '3.4'
+
+services:
+
+  sql.data:
+    environment:
+      - SA_PASSWORD=Gui@TuristicaTT
+      - ACCEPT_EULA=Y
+    ports:
+      - "5433:1433"
+
+  guiaturisticamanager:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_HTTPS_PORT=44333
+      - ConnectionString=Server=sql.data;Initial Catalog=GuiaTuristica.Identity;User Id=sa;Password=Gui@TuristicaTT
+      - CatalogConnection=Server=sql.data;Initial Catalog=GuiaTuristica.Catalog;User Id=sa;Password=Gui@TuristicaTT
+    ports:
+      - "63914:80"
+      - "44333:443"
+    depends_on:
+      - sql.data

@@ -152,7 +152,8 @@ namespace GuiaTuristicaManager.Controllers
                     {
                         return BadRequest("No se publico el archivo de imagen");
                     }
-                    var temppath = pathImages + $"{Guid.NewGuid()}_{Place.Name}.jpg";
+                    var temppath = pathImages + $"{Guid.NewGuid()}_{Place.ZoneId}.jpg";
+                    temppath = temppath.Replace(" ", "");
                     var extension = Path.GetExtension(Place.Image.FileName);
                     if (extension == ".jpg" || extension == ".jpeg" || extension == ".png")
                     {
@@ -197,6 +198,7 @@ namespace GuiaTuristicaManager.Controllers
             }
         }
 
+        [HttpPost]
         public async Task<IActionResult> PostModel(ModelVIewPost Model)
         {
             if (Model.PlaceId < 1)
@@ -220,7 +222,8 @@ namespace GuiaTuristicaManager.Controllers
                     {
                         return BadRequest("No es un archivo FBX");
                     }
-                    var temppath = pathModels + $"{Guid.NewGuid()}_{Model.Name}.fbx";
+                    var temppath = pathModels + $"{Guid.NewGuid()}_{Model.PlaceId}.fbx";
+                    temppath = temppath.Replace(" ", "");
                     using (var stream = new FileStream(pathDiretory + temppath, FileMode.Create))
                     {
                         await Model.File.CopyToAsync(stream);
@@ -256,7 +259,7 @@ namespace GuiaTuristicaManager.Controllers
                 }
             }
         }
-
+        [HttpPost]
         public async Task<IActionResult> PostMedia(MediaViewPost Media)
         {
             if (Media.ModelId < 1)
@@ -286,15 +289,16 @@ namespace GuiaTuristicaManager.Controllers
                         switch (Media.Type)
                         {
                             case TypeMedia.Sound:
-                                temppath = pathMedia + $"{Guid.NewGuid()}_{Media.Name}.mp3";
+                                temppath = pathMedia + $"{Guid.NewGuid()}_{Media.ModelId}.mp3";
                                 break;
                             case TypeMedia.Video:
-                                temppath = pathMedia + $"{Guid.NewGuid()}_{Media.Name}.mp4";
+                                temppath = pathMedia + $"{Guid.NewGuid()}_{Media.ModelId}.mp4";
                                 break;
                             case TypeMedia.Text:
-                                temppath = pathMedia + $"{Guid.NewGuid()}_{Media.Name}.txt";
+                                temppath = pathMedia + $"{Guid.NewGuid()}_{Media.ModelId}.txt";
                                 break;
                         }
+                        temppath = temppath.Replace(" ", "");
                         using (var stream = new FileStream(pathDiretory + temppath, FileMode.Create))
                         {
                             await Media.File.CopyToAsync(stream);
@@ -334,6 +338,147 @@ namespace GuiaTuristicaManager.Controllers
                 {
                     return BadRequest(e.ToString());
                 }
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteZone(int Id)
+        {
+            if (Id < 1)
+                return BadRequest("La Zona no es la correcta");
+            var Zone = await _context.Zones.FindAsync(Id);
+            if(Zone != null)
+            {
+                var Places = await _context.Places.Where(P => P.ZoneId == Zone.ZoneId).ToListAsync();
+                foreach(var place in Places)
+                {
+                    if (System.IO.File.Exists(place.PathPattern))
+                    {
+                        System.IO.File.Delete(place.PathPattern);
+                    }
+                    var model = await _context.Models.FirstOrDefaultAsync(m => m.PlaceId == place.PlaceId);
+                    if(model != null)
+                    {
+                        if (System.IO.File.Exists(model.PathModel))
+                        {
+                            System.IO.File.Delete(model.PathModel);
+                        }
+                        var medias = await _context.Media.Where(ME => ME.ModelId == model.ModelId).ToListAsync();
+                        if(medias.Count > 0)
+                        {
+                            foreach(var media in medias)
+                            {
+                                if (System.IO.File.Exists(media.PathMedia))
+                                {
+                                    System.IO.File.Delete(media.PathMedia);
+                                }
+                            }
+                        }
+                    }
+                }
+                _context.Zones.Remove(Zone);
+                await _context.SaveChangesAsync();
+                return Ok("Se Elimino correctamente");
+            }
+            else
+            {
+                return BadRequest("No se encontro la Zona");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeletePlace(int Id)
+        {
+            if (Id < 1)
+                return BadRequest("El Sitio no es el correcto");
+            var place = await _context.Places.FindAsync(Id);
+            if(place != null)
+            {
+                if (System.IO.File.Exists(place.PathPattern))
+                {
+                    System.IO.File.Delete(place.PathPattern);
+                }
+                var model = await _context.Models.FirstOrDefaultAsync(M => M.PlaceId == place.PlaceId);
+                if(model != null)
+                {
+                    if (System.IO.File.Exists(model.PathModel))
+                    {
+                        System.IO.File.Delete(model.PathModel);
+                    }
+                    var medias = await _context.Media.Where(m => m.ModelId == model.ModelId).ToListAsync();
+                    if(medias.Count > 0)
+                    {
+                        foreach(var media in medias)
+                        {
+                            if (System.IO.File.Exists(media.PathMedia))
+                            {
+                                System.IO.File.Delete(media.PathMedia);
+                            }
+                        }
+                    }
+                }
+                _context.Places.Remove(place);
+                await _context.SaveChangesAsync();
+                return Ok("Se elimino correctamente");
+            }
+            else
+            {
+                return BadRequest("No se encontro el Sitio");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteModel(int Id)
+        {
+            if (Id < 1)
+                return BadRequest("El Modelo no es el correcto");
+            var model = await _context.Models.FindAsync(Id);
+            if(model != null)
+            {
+                if (System.IO.File.Exists(model.PathModel))
+                {
+                    System.IO.File.Delete(model.PathModel);
+                }
+                var medias = await _context.Media.Where(M => M.ModelId == model.ModelId).ToListAsync();
+                if(medias.Count > 0)
+                {
+                    foreach(var media in medias)
+                    {
+                        if (System.IO.File.Exists(media.PathMedia))
+                        {
+                            System.IO.File.Delete(media.PathMedia);
+                        }
+                    }
+                }
+                _context.Models.Remove(model);
+                await _context.SaveChangesAsync();
+                return Ok("Se elimino correctamente");
+            }
+            else
+            {
+                return BadRequest("No se encontro el Modelo");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteMedia(int Id)
+        {
+            if (Id < 1)
+                return BadRequest("El Archivo Multimedia no es el correcto");
+            var media = await _context.Media.FindAsync(Id);
+            if(media != null)
+            {
+                if (System.IO.File.Exists(media.PathMedia))
+                {
+                    System.IO.File.Delete(media.PathMedia);
+                }
+                _context.Media.Remove(media);
+                await _context.SaveChangesAsync();
+                return Ok("Se elimino correctamente");
+            }
+            else
+            {
+                return BadRequest("No se encontro el Archivo Multimedia");
             }
         }
     }

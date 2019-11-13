@@ -1,31 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using GuiaTuristicaManager.Models;
 using Microsoft.AspNetCore.Authorization;
-using GuiaTuristicaManager.Data;
-using Microsoft.EntityFrameworkCore;
-using System.IO;
 
 namespace GuiaTuristicaManager.Controllers
 {
     [Authorize]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly CatalogContext _context;
-
-        public HomeController(ILogger<HomeController> logger, CatalogContext context)
+        public IActionResult Index()
         {
-            _logger = logger;
-            _context = context;
+            return View();
         }
 
-        public IActionResult Index()
+        public IActionResult About()
+        {
+            ViewData["Message"] = "Your application description page.";
+
+            return View();
+        }
+
+        public IActionResult Contact()
+        {
+            ViewData["Message"] = "Your contact page.";
+
+            return View();
+        }
+
+        public IActionResult Privacy()
         {
             return View();
         }

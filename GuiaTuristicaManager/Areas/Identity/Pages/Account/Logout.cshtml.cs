@@ -36,7 +36,7 @@ namespace GuiaTuristicaManager.Areas.Identity.Pages.Account
             }
             else
             {
-                return RedirectToPage();
+                return Page();
             }
         }
     }

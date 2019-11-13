@@ -1,4 +1,4 @@
-using GuiaTuristicaManager.Data;
+﻿using GuiaTuristicaManager.Data;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace GuiaTuristicaManager
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
@@ -20,7 +20,7 @@ namespace GuiaTuristicaManager
                     var usermanager = services.GetService<UserManager<IdentityUser>>();
                     Seed(usermanager).Wait();
                 })
-                .MigrateDbContext<CatalogContext>((context,services) => { })
+                .MigrateDbContext<CatalogContext>((context, services) => { })
                 .Run();
         }
 
@@ -33,9 +33,9 @@ namespace GuiaTuristicaManager
         {
             if ((await userManager.FindByEmailAsync("administrador@guiaturistica.com")) == null)
             {
-                var user = new IdentityUser() 
-                { 
-                    UserName = "administrador@guiaturistica.com", 
+                var user = new IdentityUser()
+                {
+                    UserName = "administrador@guiaturistica.com",
                     Email = "administrador@guiaturistica.com",
                     EmailConfirmed = true,
                     PhoneNumber = "000-000-000",

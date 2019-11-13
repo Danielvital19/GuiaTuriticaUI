@@ -3,7 +3,7 @@
   <PropertyGroup Label="Globals">
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
-    <ProjectGuid>36bd131a-c353-4ffd-8c64-ce6263b87862</ProjectGuid>
+    <ProjectGuid>701274d4-3372-4b9d-a81c-9d708e484801</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}</DockerServiceUrl>
     <DockerServiceName>guiaturisticamanager</DockerServiceName>

@@ -12,12 +12,7 @@ To use ASP.NET Core Identity you also need to enable authentication. To authenti
 
 The generated UI requires MVC. To add MVC to your app:
 1. Call services.AddMvc() from your ConfigureServices method
-2. Call app.UseRouting() at the top your Configure method, and UseEndpoints() after authentication:
-    app.UseEndpoints(endpoints =>
-    {
-        endpoints.MapControllers();
-        endpoints.MapRazorPages();
-    });
+2. Call app.UseMvc() from your Configure method (after authentication)
 
 Apps that use ASP.NET Core Identity should also use HTTPS. To enable HTTPS see https://go.microsoft.com/fwlink/?linkid=848054.
 

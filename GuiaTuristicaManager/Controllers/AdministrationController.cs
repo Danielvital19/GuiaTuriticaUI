@@ -148,13 +148,13 @@ namespace GuiaTuristicaManager.Controllers
                     {
                         Directory.CreateDirectory(pathDiretory + pathImages);
                     }
-                    if(Place.Image == null)
+                    if (Place.Image == null)
                     {
                         return BadRequest("No se publico el archivo de imagen");
                     }
                     var temppath = pathImages + $"{Guid.NewGuid()}_{Place.Name}.jpg";
                     var extension = Path.GetExtension(Place.Image.FileName);
-                    if(extension == ".jpg" || extension == ".jpeg" || extension == ".png")
+                    if (extension == ".jpg" || extension == ".jpeg" || extension == ".png")
                     {
                         using (var stream = new FileStream(pathDiretory + temppath, FileMode.Create))
                         {
@@ -211,7 +211,7 @@ namespace GuiaTuristicaManager.Controllers
                     {
                         Directory.CreateDirectory(pathDiretory + pathModels);
                     }
-                    if(Model.File == null)
+                    if (Model.File == null)
                     {
                         return BadRequest("No se publico el archivo fbx");
                     }
@@ -271,7 +271,7 @@ namespace GuiaTuristicaManager.Controllers
                     {
                         Directory.CreateDirectory(pathDiretory + pathMedia);
                     }
-                    if(Media.File  == null)
+                    if (Media.File == null)
                     {
                         return BadRequest("No se publico el archivo multimedia");
                     }

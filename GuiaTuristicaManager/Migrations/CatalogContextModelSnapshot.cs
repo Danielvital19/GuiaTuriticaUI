@@ -14,7 +14,7 @@ namespace GuiaTuristicaManager.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.0.0")
+                .HasAnnotation("ProductVersion", "2.1.11-servicing-32099")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -22,20 +22,15 @@ namespace GuiaTuristicaManager.Migrations
                 {
                     b.Property<int>("MediaId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("ModelId")
-                        .HasColumnType("int");
+                    b.Property<int>("ModelId");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Name");
 
-                    b.Property<string>("PathMedia")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("PathMedia");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                    b.Property<int>("Type");
 
                     b.HasKey("MediaId");
 
@@ -48,17 +43,13 @@ namespace GuiaTuristicaManager.Migrations
                 {
                     b.Property<int>("ModelId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Name");
 
-                    b.Property<string>("PathModel")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("PathModel");
 
-                    b.Property<int>("PlaceId")
-                        .HasColumnType("int");
+                    b.Property<int>("PlaceId");
 
                     b.HasKey("ModelId");
 
@@ -72,17 +63,13 @@ namespace GuiaTuristicaManager.Migrations
                 {
                     b.Property<int>("PlaceId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Name");
 
-                    b.Property<string>("PathPattern")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("PathPattern");
 
-                    b.Property<int>("ZoneId")
-                        .HasColumnType("int");
+                    b.Property<int>("ZoneId");
 
                     b.HasKey("PlaceId");
 
@@ -95,11 +82,9 @@ namespace GuiaTuristicaManager.Migrations
                 {
                     b.Property<int>("ZoneId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Name");
 
                     b.HasKey("ZoneId");
 
@@ -111,8 +96,7 @@ namespace GuiaTuristicaManager.Migrations
                     b.HasOne("GuiaTuristicaManager.Models.Model", "Model")
                         .WithMany("Media")
                         .HasForeignKey("ModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GuiaTuristicaManager.Models.Model", b =>
@@ -120,8 +104,7 @@ namespace GuiaTuristicaManager.Migrations
                     b.HasOne("GuiaTuristicaManager.Models.Place", "Place")
                         .WithMany()
                         .HasForeignKey("PlaceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GuiaTuristicaManager.Models.Place", b =>
@@ -129,8 +112,7 @@ namespace GuiaTuristicaManager.Migrations
                     b.HasOne("GuiaTuristicaManager.Models.Zone", "Zone")
                         .WithMany()
                         .HasForeignKey("ZoneId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

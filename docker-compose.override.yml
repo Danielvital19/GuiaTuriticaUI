@@ -16,6 +16,6 @@ services:
       - ConnectionString=Server=sql.data;Initial Catalog=GuiaTuristica.Identity;User Id=sa;Password=Gui@TuristicaTT
       - CatalogConnection=Server=sql.data;Initial Catalog=GuiaTuristica.Catalog;User Id=sa;Password=Gui@TuristicaTT
     ports:
-      - "63914:80"
+      - "62342:80"
     depends_on:
       - sql.data

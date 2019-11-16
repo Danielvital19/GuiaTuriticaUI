@@ -6,7 +6,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2017-latest
 
   guiaturisticamanager:
-    image: ${DOCKER_REGISTRY-}guiaturisticamanager
+    image: guiaturisticamanager
     build:
-      context: .
-      dockerfile: GuiaTuristicaManager/Dockerfile
+      context: ./GuiaTuristicaManager
+      dockerfile: Dockerfile

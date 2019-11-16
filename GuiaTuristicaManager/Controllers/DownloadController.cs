@@ -12,11 +12,13 @@ namespace GuiaTuristicaManager.Controllers
     {
         private readonly string pathDiretory;
         private readonly CatalogContext _context;
+        private readonly string PathZonesDatabase;
 
         public DownloadController(CatalogContext context)
         {
             _context = context;
             pathDiretory = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "/GuiaTuristicaAR";
+            PathZonesDatabase = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "/GuiaTuristicaAR/Zones/";
         }
 
         [HttpGet]
@@ -131,6 +133,68 @@ namespace GuiaTuristicaManager.Controllers
             {
                 return BadRequest("filename not present");
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadDataBaseZone(int Id)
+        {
+            if (Id < 1)
+                return BadRequest();
+            var zone = await _context.Zones.FindAsync(Id);
+            if(zone != null)
+            {
+                try
+                {
+                    var temppath = pathDiretory + zone.PathDatabase;
+                    var memory = new MemoryStream();
+                    using (var stream = new FileStream(temppath, FileMode.Open))
+                    {
+                        await stream.CopyToAsync(memory);
+                    }
+                    memory.Position = 0;
+                    return File(memory, GetMimeType(temppath), Path.GetFileName(temppath));
+                }
+                catch
+                {
+                    return BadRequest("filename not present");
+                }
+            }
+            else
+            {
+                return BadRequest("filename not present");
+            }
+            
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadCovereZone(int Id)
+        {
+            if (Id < 1)
+                return BadRequest();
+            var zone = await _context.Zones.FindAsync(Id);
+            if (zone != null)
+            {
+                try
+                {
+                    var temppath = pathDiretory + zone.PathCover;
+                    var memory = new MemoryStream();
+                    using (var stream = new FileStream(temppath, FileMode.Open))
+                    {
+                        await stream.CopyToAsync(memory);
+                    }
+                    memory.Position = 0;
+                    return File(memory, GetMimeType(temppath), Path.GetFileName(temppath));
+                }
+                catch
+                {
+                    return BadRequest("filename not present");
+                }
+            }
+            else
+            {
+                return BadRequest("filename not present");
+            }
+
         }
 
         private string GetMimeType(string fileName)

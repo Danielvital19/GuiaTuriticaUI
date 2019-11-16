@@ -6,28 +6,36 @@ using System.Threading.Tasks;
 using GuiaTuristicaManager.Data;
 using GuiaTuristicaManager.Models;
 using GuiaTuristicaManager.Models.PostModel;
+using GuiaTuristicaManager.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GuiaTuristicaManager.Controllers
 {
     public class AdministrationController : Controller
     {
         private readonly string pathDiretory;
+        private readonly string PathZonesDatabase;
+        private readonly string PathZoneCover;
         private readonly string pathImages;
         private readonly string pathModels;
         private readonly string pathMedia;
 
         private readonly CatalogContext _context;
+        private readonly ILogger<AdministrationController> _logger;
 
-        public AdministrationController(CatalogContext context)
+        public AdministrationController(CatalogContext context, ILogger<AdministrationController> logger)
         {
             _context = context;
             pathDiretory = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "/GuiaTuristicaAR";
             pathImages = "/Images/";
             pathModels = "/Models/";
             pathMedia = "/Media/";
+            PathZonesDatabase = "/Zones/";
+            PathZoneCover = "/Cover/";
+            _logger = logger;
         }
         // GET: Administration
         [HttpGet]
@@ -108,28 +116,59 @@ namespace GuiaTuristicaManager.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostZone(string Name)
+        public async Task<IActionResult> PostZone(ZoneViewPost Zone)
         {
-            if (!string.IsNullOrEmpty(Name))
+            try
             {
-                var zone = new Zone()
+                if (!Directory.Exists(pathDiretory + PathZoneCover))
                 {
-                    Name = Name
-                };
-                _context.Zones.Add(zone);
-                var result = await _context.SaveChangesAsync();
-                if (result > 0)
+                        Directory.CreateDirectory(pathDiretory + PathZoneCover);
+                }
+                if (Zone.Image == null)
                 {
-                    return Ok(zone);
+                    return BadRequest("No se publico el archivo de imagen");
+                }
+                var temppath = PathZoneCover + $"{Guid.NewGuid()}.jpg";
+                temppath = temppath.Replace(" ", "");
+                var extension = Path.GetExtension(Zone.Image.FileName);
+                if (extension == ".jpg" || extension == ".jpeg" || extension == ".png")
+                {
+                    using (var stream = new FileStream(pathDiretory + temppath, FileMode.Create))
+                    {
+                        await Zone.Image.CopyToAsync(stream);
+                    }
+                    var zone = new Zone()
+                    {
+                        Name = Zone.Name,
+                        PathCover = temppath
+                    };
+                    try
+                    {
+                        _context.Zones.Add(zone);
+                        var result = await _context.SaveChangesAsync();
+                        if (result > 0)
+                        {
+                            return Ok(zone);
+                        }
+                        else
+                        {
+                            return BadRequest();
+                        }
+                    }
+                    catch
+                    {
+                        System.IO.File.Delete(pathDiretory + temppath);
+                        return BadRequest();
+                    }
                 }
                 else
                 {
-                    return BadRequest();
+                    return BadRequest("Tipo de imagen no admitido");
                 }
             }
-            else
+            catch(Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.ToString());
             }
         }
 
@@ -480,6 +519,64 @@ namespace GuiaTuristicaManager.Controllers
             {
                 return BadRequest("No se encontro el Archivo Multimedia");
             }
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> RunRutime(int Id)
+        {
+            var places = await _context.Places.Where(p => p.ZoneId == Id).ToListAsync();
+            if(places.Count > 0)
+            {
+                if(!Directory.Exists(pathDiretory + PathZonesDatabase))
+                {
+                    Directory.CreateDirectory(pathDiretory + PathZonesDatabase);
+                }
+                var text = string.Empty;
+                foreach(var place in places)
+                {
+                    text += $"{place.PlaceId}|" + pathDiretory + place.PathPattern + Environment.NewLine;
+                }
+                var fileText = pathDiretory +  PathZonesDatabase + Id + ".txt";
+                var fileoutput = pathDiretory + PathZonesDatabase + Id + ".imgdb";
+                if (System.IO.File.Exists(fileText))
+                {
+                    System.IO.File.Delete(fileText);
+                }
+                if (System.IO.File.Exists(pathDiretory + PathZonesDatabase + Id + ".imgdb-imglist.txt"))
+                {
+                    System.IO.File.Delete(pathDiretory + PathZonesDatabase + Id +".imgdb-imglist.txt");
+                }
+                if (System.IO.File.Exists(pathDiretory + PathZonesDatabase + Id + ".imgdb"))
+                {
+                    System.IO.File.Delete(pathDiretory + PathZonesDatabase + Id + ".imgdb");
+                }
+                System.IO.File.WriteAllText(fileText, text);
+                try
+                {
+                    await $"/app/wwwroot/lib/augmented_image_cli_linux build-db --input_image_list_path={fileText} --output_db_path={fileoutput}".Bash(_logger);
+                }
+                catch(Exception e)
+                {
+                    return BadRequest(e);
+                }
+                try
+                {
+                    var zone = await _context.Zones.FindAsync(Id);
+                    zone.PathDatabase = PathZonesDatabase + Id + ".imgdb";
+                    zone.IsBuild = true;
+                    _context.Zones.Update(zone);
+                    await _context.SaveChangesAsync();
+                    return Ok("Construido con exito");
+                }
+                catch
+                {
+                    if (System.IO.File.Exists(fileoutput))
+                    {
+                        System.IO.File.Delete(fileoutput);
+                    }
+                }
+            }
+            return BadRequest("No se encontraron imagenes");
         }
     }
 }

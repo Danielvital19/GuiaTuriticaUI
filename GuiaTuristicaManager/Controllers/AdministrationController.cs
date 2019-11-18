@@ -521,62 +521,62 @@ namespace GuiaTuristicaManager.Controllers
             }
         }
         
-        [HttpPost]
-        public async Task<IActionResult> RunRutime(int Id)
-        {
-            var places = await _context.Places.Where(p => p.ZoneId == Id).ToListAsync();
-            if(places.Count > 0)
-            {
-                if(!Directory.Exists(pathDiretory + PathZonesDatabase))
-                {
-                    Directory.CreateDirectory(pathDiretory + PathZonesDatabase);
-                }
-                var text = string.Empty;
-                foreach(var place in places)
-                {
-                    text += $"{place.PlaceId}|" + pathDiretory + place.PathPattern + Environment.NewLine;
-                }
-                var fileText = pathDiretory +  PathZonesDatabase + Id + ".txt";
-                var fileoutput = pathDiretory + PathZonesDatabase + Id + ".imgdb";
-                if (System.IO.File.Exists(fileText))
-                {
-                    System.IO.File.Delete(fileText);
-                }
-                if (System.IO.File.Exists(pathDiretory + PathZonesDatabase + Id + ".imgdb-imglist.txt"))
-                {
-                    System.IO.File.Delete(pathDiretory + PathZonesDatabase + Id +".imgdb-imglist.txt");
-                }
-                if (System.IO.File.Exists(pathDiretory + PathZonesDatabase + Id + ".imgdb"))
-                {
-                    System.IO.File.Delete(pathDiretory + PathZonesDatabase + Id + ".imgdb");
-                }
-                System.IO.File.WriteAllText(fileText, text);
-                try
-                {
-                    await $"/app/wwwroot/lib/augmented_image_cli_linux build-db --input_image_list_path={fileText} --output_db_path={fileoutput}".Bash(_logger);
-                }
-                catch(Exception e)
-                {
-                    return BadRequest(e);
-                }
-                try
-                {
-                    var zone = await _context.Zones.FindAsync(Id);
-                    zone.PathDatabase = PathZonesDatabase + Id + ".imgdb";
-                    zone.IsBuild = true;
-                    _context.Zones.Update(zone);
-                    await _context.SaveChangesAsync();
-                    return Ok("Construido con exito");
-                }
-                catch
-                {
-                    if (System.IO.File.Exists(fileoutput))
-                    {
-                        System.IO.File.Delete(fileoutput);
-                    }
-                }
-            }
-            return BadRequest("No se encontraron imagenes");
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> RunRutime(int Id)
+        //{
+        //    var places = await _context.Places.Where(p => p.ZoneId == Id).ToListAsync();
+        //    if(places.Count > 0)
+        //    {
+        //        if(!Directory.Exists(pathDiretory + PathZonesDatabase))
+        //        {
+        //            Directory.CreateDirectory(pathDiretory + PathZonesDatabase);
+        //        }
+        //        var text = string.Empty;
+        //        foreach(var place in places)
+        //        {
+        //            text += $"{place.PlaceId}|" + pathDiretory + place.PathPattern + Environment.NewLine;
+        //        }
+        //        var fileText = pathDiretory +  PathZonesDatabase + Id + ".txt";
+        //        var fileoutput = pathDiretory + PathZonesDatabase + Id + ".imgdb";
+        //        if (System.IO.File.Exists(fileText))
+        //        {
+        //            System.IO.File.Delete(fileText);
+        //        }
+        //        if (System.IO.File.Exists(pathDiretory + PathZonesDatabase + Id + ".imgdb-imglist.txt"))
+        //        {
+        //            System.IO.File.Delete(pathDiretory + PathZonesDatabase + Id +".imgdb-imglist.txt");
+        //        }
+        //        if (System.IO.File.Exists(pathDiretory + PathZonesDatabase + Id + ".imgdb"))
+        //        {
+        //            System.IO.File.Delete(pathDiretory + PathZonesDatabase + Id + ".imgdb");
+        //        }
+        //        System.IO.File.WriteAllText(fileText, text);
+        //        try
+        //        {
+        //            await $"/app/wwwroot/lib/augmented_image_cli_linux build-db --input_image_list_path={fileText} --output_db_path={fileoutput}".Bash(_logger);
+        //        }
+        //        catch(Exception e)
+        //        {
+        //            return BadRequest(e);
+        //        }
+        //        try
+        //        {
+        //            var zone = await _context.Zones.FindAsync(Id);
+        //            zone.PathDatabase = PathZonesDatabase + Id + ".imgdb";
+        //            zone.IsBuild = true;
+        //            _context.Zones.Update(zone);
+        //            await _context.SaveChangesAsync();
+        //            return Ok("Construido con exito");
+        //        }
+        //        catch
+        //        {
+        //            if (System.IO.File.Exists(fileoutput))
+        //            {
+        //                System.IO.File.Delete(fileoutput);
+        //            }
+        //        }
+        //    }
+        //    return BadRequest("No se encontraron imagenes");
+        //}
     }
 }

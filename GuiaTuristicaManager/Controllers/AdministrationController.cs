@@ -8,9 +8,11 @@ using GuiaTuristicaManager.Models;
 using GuiaTuristicaManager.Models.PostModel;
 using GuiaTuristicaManager.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace GuiaTuristicaManager.Controllers
 {
@@ -37,6 +39,12 @@ namespace GuiaTuristicaManager.Controllers
             PathZoneCover = "/Cover/";
             _logger = logger;
         }
+
+
+        public  IActionResult Index() {
+            return View();
+        }
+
         // GET: Administration
         [HttpGet]
         public async Task<ActionResult> GetAllZones()
@@ -45,8 +53,9 @@ namespace GuiaTuristicaManager.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPlace(int Id)
+        public async Task<IActionResult> GetAllPlace(int id)
         {
+            int Id = id;
             if (Id < 1)
             {
                 return BadRequest();
@@ -116,13 +125,19 @@ namespace GuiaTuristicaManager.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostZone(ZoneViewPost Zone)
+        public async Task<IActionResult> PostZone(IFormFile file, string zonename)
         {
+            ZoneViewPost Zone = new ZoneViewPost
+            {
+                Name = zonename,
+                Image = file
+            };
+
             try
             {
                 if (!Directory.Exists(pathDiretory + PathZoneCover))
                 {
-                        Directory.CreateDirectory(pathDiretory + PathZoneCover);
+                    Directory.CreateDirectory(pathDiretory + PathZoneCover);
                 }
                 if (Zone.Image == null)
                 {
@@ -467,11 +482,11 @@ namespace GuiaTuristicaManager.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteModel(int Id)
+        public async Task<IActionResult> DeleteModel(int id)
         {
-            if (Id < 1)
+            if (id < 1)
                 return BadRequest("El Modelo no es el correcto");
-            var model = await _context.Models.FindAsync(Id);
+            var model = await _context.Models.FindAsync(id);
             if(model != null)
             {
                 if (System.IO.File.Exists(model.PathModel))

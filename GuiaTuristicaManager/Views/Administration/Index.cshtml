@@ -1,0 +1,49 @@
+﻿<head>
+    <title>DevExtreme Demo</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script>window.jQuery || document.write(decodeURIComponent('%3Cscript src="js/jquery.min.js"%3E%3C/script%3E'))</script>
+    <link rel="stylesheet" type="text/css" href="https://cdn3.devexpress.com/jslib/19.2.3/css/dx.common.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/dx.generic.custom-scheme (1).css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular.min.js"></script>
+    <script>window.angular || document.write(decodeURIComponent('%3Cscript src="js/angular.min.js"%3E%3C\/script%3E'))</script>
+    <script src="https://cdn3.devexpress.com/jslib/19.2.3/js/dx.all.js"></script>
+
+
+    <link href="~/css/font-awesome-4.7.0/css/all.css" rel="stylesheet" />
+    <link href="~/css/Animate.css" rel="stylesheet" />
+</head>
+<div style="position: absolute;left: 0px;width: 100%;height: 100%;">
+    <div style="background-image: url(images/background.jpg);background-repeat: no-repeat;background-position: center;background-size: cover;height: 100%;
+        /* filter: brightness(0.8); */
+     filter: contrast(76%);
+    /* filter: opacity(81%); */
+    /*filter: saturate(80%);*/
+    /*filter: sepia(24%);*/"></div>
+
+    <div>
+        <div style="width: -webkit-fill-available;height: 52px;position: absolute;top: 6%;">
+            <p style="color: #f7f7f7;text-align: center;margin-top: 0px;font-size: 31px;position: absolute;top: 18px;right: 45%;"> Zonas Turísticas</p>
+        </div>
+        <div style="padding-left: 700px;padding-right: 700px;position: absolute;top: 12%;">
+            <div class="demo-container" ng-app="DemoApp" ng-controller="DemoController" style="text-align: -webkit-center">
+                <div dx-form="formOptions"></div>
+
+                <div id="data-grid-demo">
+                    <div id="gridContainer" dx-data-grid="dataGridOptions"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sites-PopUp" style="display:none; position: absolute;width: 100%;height: 100%;top: 0px;background: #fbf7f7b8;z-index: 10001;">
+        <div style="position: absolute;height: 77%;width: 42%;background: #ededed;left: 29%;top: 8%; border-radius: 14px;">
+            <i onclick="closeSitePopUp()" class="fas fa-times-circle" style="width: 4%;height: 4%;position: absolute;font-size: 32px;right: 2px;top: 5px;cursor: pointer;"></i>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/administration/models.js"></script>
+<script src="~/js/administration/sites.js"></script>

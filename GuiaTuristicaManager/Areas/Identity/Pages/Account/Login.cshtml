@@ -5,12 +5,36 @@
     ViewData["Title"] = "Iniciar Sesión";
 }
 
+<link href="~/css/site.css" rel="stylesheet" />
+
+
+<div id="login-background" style="
+    height: -webkit-fill-available;
+    width: -webkit-fill-available;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+     background-image: url(../../../../images/background3.jpg);background-repeat: no-repeat;background-position: center;background-size: cover;
+        /* filter: brightness(0.8); */
+     filter: contrast(76%);
+    /* filter: opacity(81%); */
+    /*filter: saturate(80%);*/
+    /*filter: sepia(24%);*/
+
+     ">
+</div>
+
+<div id="blur-div">
+</div>
+
 <h1 class="col-md-6 offset-3">@ViewData["Title"]</h1>
+
 <div class="row">
+    <div id="login-background"></div>
+
     <div class="col-md-6 offset-3">
         <section>
             <form id="account" method="post">
-                <hr />
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="Input.Email"></label>

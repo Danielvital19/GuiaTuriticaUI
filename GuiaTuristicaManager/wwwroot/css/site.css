@@ -35,3 +35,27 @@ body {
         display: none;
     }
 }
+
+
+#blur-div {
+    height: 400px;
+    width: 1200px;
+    background: inherit;
+    position: absolute;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+    #blur-div:before {
+        content: '';
+        height: 450px;
+        width: 1250px;
+        position: absolute;
+        top: -25px;
+        left: -25px;
+        bottom: 0;
+        right: 0;
+        background: inherit;
+        box-shadow: inset 2000px 2000px 2025px 300px rgba(255,255,255,0.2);
+        filter: blur(10px);
+    }

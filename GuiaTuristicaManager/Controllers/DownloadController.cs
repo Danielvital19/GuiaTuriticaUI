@@ -52,7 +52,7 @@ namespace GuiaTuristicaManager.Controllers
                 return BadRequest("filename not present");
             var place = await _context.Places.FindAsync(Id);
             if (place != null)
-            {
+            {   
                 try
                 {
                     var temppath = pathDiretory + place.PathPattern;
@@ -136,38 +136,7 @@ namespace GuiaTuristicaManager.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> DownloadDataBaseZone(int Id)
-        {
-            if (Id < 1)
-                return BadRequest();
-            var zone = await _context.Zones.FindAsync(Id);
-            if(zone != null)
-            {
-                try
-                {
-                    var temppath = pathDiretory + zone.PathDatabase;
-                    var memory = new MemoryStream();
-                    using (var stream = new FileStream(temppath, FileMode.Open))
-                    {
-                        await stream.CopyToAsync(memory);
-                    }
-                    memory.Position = 0;
-                    return File(memory, GetMimeType(temppath), Path.GetFileName(temppath));
-                }
-                catch
-                {
-                    return BadRequest("filename not present");
-                }
-            }
-            else
-            {
-                return BadRequest("filename not present");
-            }
-            
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> DownloadCovereZone(int Id)
+        public async Task<IActionResult> DownloadCoverZone(int Id)
         {
             if (Id < 1)
                 return BadRequest();

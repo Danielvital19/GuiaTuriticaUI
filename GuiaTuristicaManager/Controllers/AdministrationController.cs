@@ -65,19 +65,17 @@ namespace GuiaTuristicaManager.Controllers
                 var Places = await _context.Places.Where(P => P.ZoneId == Id).OrderBy(P => P.Name).ToListAsync();
                 if (Places.Count < 1)
                 {
-                    return NotFound();
+                    return Ok(new List<string>());
                 }
                 else
                 {
-                    var path = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                    path += "/";
                     List<PlaceVIew> PlacesVIew = new List<PlaceVIew>();
                     foreach (var place in Places)
                     {
                         var placeview = new PlaceVIew()
                         {
                             PlaceId = place.PlaceId,
-                            Base64Image = Convert.ToBase64String(System.IO.File.ReadAllBytes(path + place.PathPattern)),
+                            Base64Image = Convert.ToBase64String(System.IO.File.ReadAllBytes(pathDiretory + place.PathPattern)),
                             Name = place.Name
                         };
                         PlacesVIew.Add(placeview);
@@ -188,8 +186,17 @@ namespace GuiaTuristicaManager.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostPlace(PlaceViewPost Place)
+        public async Task<IActionResult> PostPlace(IFormFile file, string placename, int zoneId)
         {
+
+            PlaceViewPost Place = new PlaceViewPost
+            {
+                ZoneId = zoneId,
+                Name = placename,
+                Image = file
+            };
+
+
             if (Place.ZoneId < 1)
             {
                 return BadRequest();
@@ -253,8 +260,16 @@ namespace GuiaTuristicaManager.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostModel(ModelVIewPost Model)
+        public async Task<IActionResult> PostModel(IFormFile file, string name, int placeid)
         {
+
+            ModelVIewPost Model = new ModelVIewPost
+            {
+                PlaceId = placeid,
+                Name = name,
+                File = file
+            };
+
             if (Model.PlaceId < 1)
             {
                 return BadRequest();
@@ -301,7 +316,7 @@ namespace GuiaTuristicaManager.Controllers
                             return BadRequest();
                         }
                     }
-                    catch
+                    catch (Exception e)
                     {
                         System.IO.File.Delete(pathDiretory + temppath);
                         return BadRequest();

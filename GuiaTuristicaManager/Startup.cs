@@ -73,7 +73,7 @@ namespace GuiaTuristicaManager
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Administration}/{action=Index}/{id?}");
             });
         }
     }

@@ -14,8 +14,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
+
 namespace GuiaTuristicaManager.Controllers
 {
+    [Authorize]
     public class AdministrationController : Controller
     {
         private readonly string pathDiretory;
@@ -24,6 +26,7 @@ namespace GuiaTuristicaManager.Controllers
         private readonly string pathImages;
         private readonly string pathModels;
         private readonly string pathMedia;
+        private readonly string pathWtc;
 
         private readonly CatalogContext _context;
         private readonly ILogger<AdministrationController> _logger;
@@ -37,11 +40,13 @@ namespace GuiaTuristicaManager.Controllers
             pathMedia = "/Media/";
             PathZonesDatabase = "/Zones/";
             PathZoneCover = "/Cover/";
+            pathWtc = "/WtcDataBase";
             _logger = logger;
         }
 
 
-        public  IActionResult Index() {
+        public IActionResult Index()
+        {
             return View();
         }
 
@@ -123,12 +128,13 @@ namespace GuiaTuristicaManager.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostZone(IFormFile file, string zonename)
+        public async Task<IActionResult> PostZone(IFormFile file, string zonename, IFormFile WtcFile)
         {
             ZoneViewPost Zone = new ZoneViewPost
             {
                 Name = zonename,
-                Image = file
+                Image = file,
+                WtcFile = WtcFile
             };
 
             try
@@ -150,28 +156,62 @@ namespace GuiaTuristicaManager.Controllers
                     {
                         await Zone.Image.CopyToAsync(stream);
                     }
-                    var zone = new Zone()
+                    if (!Directory.Exists(pathDiretory + pathWtc))
                     {
-                        Name = Zone.Name,
-                        PathCover = temppath
-                    };
-                    try
-                    {
-                        _context.Zones.Add(zone);
-                        var result = await _context.SaveChangesAsync();
-                        if (result > 0)
-                        {
-                            return Ok(zone);
-                        }
-                        else
-                        {
-                            return BadRequest();
-                        }
+                        Directory.CreateDirectory(pathDiretory + pathWtc);
                     }
-                    catch
+                    if (Zone.WtcFile == null)
                     {
                         System.IO.File.Delete(pathDiretory + temppath);
-                        return BadRequest();
+                        return BadRequest("No se publico el archivo de imagen");
+                    }
+                    extension = Path.GetExtension(Zone.WtcFile.FileName);
+                    if (extension == ".wtc")
+                    {
+                        try
+                        {
+                            var temppathwtc = pathWtc + $"{Guid.NewGuid()}.wtc";
+                            using (var stream = new FileStream(pathDiretory + temppathwtc, FileMode.Create))
+                            {
+                                await Zone.Image.CopyToAsync(stream);
+                            }
+
+                            var zone = new Zone()
+                            {
+                                Name = Zone.Name,
+                                PathCover = temppath,
+                                PathWtc = temppathwtc
+                            };
+                            try
+                            {
+                                _context.Zones.Add(zone);
+                                var result = await _context.SaveChangesAsync();
+                                if (result > 0)
+                                {
+                                    return Ok(zone);
+                                }
+                                else
+                                {
+                                    return BadRequest();
+                                }
+                            }
+                            catch
+                            {
+                                System.IO.File.Delete(pathDiretory + temppath);
+                                System.IO.File.Delete(pathDiretory + temppathwtc);
+                                return BadRequest();
+                            }
+                        }
+                        catch
+                        {
+                            System.IO.File.Delete(pathDiretory + temppath);
+                            return BadRequest("No se publico el archivo wtc");
+                        }
+                    }
+                    else
+                    {
+                        System.IO.File.Delete(pathDiretory + temppath);
+                        return BadRequest("No se publico el archivo de imagen");
                     }
                 }
                 else
@@ -179,7 +219,7 @@ namespace GuiaTuristicaManager.Controllers
                     return BadRequest("Tipo de imagen no admitido");
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return BadRequest(e.ToString());
             }
@@ -416,26 +456,26 @@ namespace GuiaTuristicaManager.Controllers
             if (Id < 1)
                 return BadRequest("La Zona no es la correcta");
             var Zone = await _context.Zones.FindAsync(Id);
-            if(Zone != null)
+            if (Zone != null)
             {
                 var Places = await _context.Places.Where(P => P.ZoneId == Zone.ZoneId).ToListAsync();
-                foreach(var place in Places)
+                foreach (var place in Places)
                 {
                     if (System.IO.File.Exists(place.PathPattern))
                     {
                         System.IO.File.Delete(place.PathPattern);
                     }
                     var model = await _context.Models.FirstOrDefaultAsync(m => m.PlaceId == place.PlaceId);
-                    if(model != null)
+                    if (model != null)
                     {
                         if (System.IO.File.Exists(model.PathModel))
                         {
                             System.IO.File.Delete(model.PathModel);
                         }
                         var medias = await _context.Media.Where(ME => ME.ModelId == model.ModelId).ToListAsync();
-                        if(medias.Count > 0)
+                        if (medias.Count > 0)
                         {
-                            foreach(var media in medias)
+                            foreach (var media in medias)
                             {
                                 if (System.IO.File.Exists(media.PathMedia))
                                 {
@@ -461,23 +501,23 @@ namespace GuiaTuristicaManager.Controllers
             if (Id < 1)
                 return BadRequest("El Sitio no es el correcto");
             var place = await _context.Places.FindAsync(Id);
-            if(place != null)
+            if (place != null)
             {
                 if (System.IO.File.Exists(place.PathPattern))
                 {
                     System.IO.File.Delete(place.PathPattern);
                 }
                 var model = await _context.Models.FirstOrDefaultAsync(M => M.PlaceId == place.PlaceId);
-                if(model != null)
+                if (model != null)
                 {
                     if (System.IO.File.Exists(model.PathModel))
                     {
                         System.IO.File.Delete(model.PathModel);
                     }
                     var medias = await _context.Media.Where(m => m.ModelId == model.ModelId).ToListAsync();
-                    if(medias.Count > 0)
+                    if (medias.Count > 0)
                     {
-                        foreach(var media in medias)
+                        foreach (var media in medias)
                         {
                             if (System.IO.File.Exists(media.PathMedia))
                             {
@@ -502,16 +542,16 @@ namespace GuiaTuristicaManager.Controllers
             if (id < 1)
                 return BadRequest("El Modelo no es el correcto");
             var model = await _context.Models.FindAsync(id);
-            if(model != null)
+            if (model != null)
             {
                 if (System.IO.File.Exists(model.PathModel))
                 {
                     System.IO.File.Delete(model.PathModel);
                 }
                 var medias = await _context.Media.Where(M => M.ModelId == model.ModelId).ToListAsync();
-                if(medias.Count > 0)
+                if (medias.Count > 0)
                 {
-                    foreach(var media in medias)
+                    foreach (var media in medias)
                     {
                         if (System.IO.File.Exists(media.PathMedia))
                         {
@@ -535,7 +575,7 @@ namespace GuiaTuristicaManager.Controllers
             if (Id < 1)
                 return BadRequest("El Archivo Multimedia no es el correcto");
             var media = await _context.Media.FindAsync(Id);
-            if(media != null)
+            if (media != null)
             {
                 if (System.IO.File.Exists(media.PathMedia))
                 {
@@ -550,7 +590,7 @@ namespace GuiaTuristicaManager.Controllers
                 return BadRequest("No se encontro el Archivo Multimedia");
             }
         }
-        
+
         //[HttpPost]
         //public async Task<IActionResult> RunRutime(int Id)
         //{

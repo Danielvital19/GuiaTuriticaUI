@@ -7,5 +7,6 @@ namespace GuiaTuristicaManager.Models
         public string Name { get; set; }
 
         public string PathCover { get; set; }
+        public string PathWtc { get; set; }
     }
 }

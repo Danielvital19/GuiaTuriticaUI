@@ -1,4 +1,4 @@
-﻿var image, datagird, zones = [], store;
+﻿var image, datagird, zones = [], store, qr;
 
 var DemoApp = angular.module('DemoApp', ['dx']);
 
@@ -76,6 +76,37 @@ DemoApp.controller('DemoController', function DemoController($scope) {
                                 }
                             }
                         }
+                    },
+                    {
+                        dataField: "qr",
+                        label: { text: "Archivo WTC" },
+                        editorType: "dxFileUploader",
+                        editorOptions:
+                        {
+                            selectButtonText: "Seleccionar",
+                            multiple: false,
+                            labelText: "",
+                            uploadUrl: "",
+                            accept: "image/*",
+                            uploadMode: "useForm",
+                            onValueChanged: function (e) {
+                                var files = e.value
+                                if (files.length > 0) {
+                                    var file = files[0]
+                                    fileCach = file;
+                                    // Poner la imagen seleccionada en el tag IMG
+                                    var reader = new FileReader();
+                                    reader.addEventListener("load", function () {
+                                        var img = document.getElementById('picture');
+                                        img.src = event.target.result;
+                                    }, false),
+                                        function () { console.log = console.log.bind(console); }();
+
+                                    reader.readAsDataURL(file);
+                                    qr = e.value;
+                                }
+                            }
+                        }
                     }
                 ]
             }
@@ -119,6 +150,10 @@ DemoApp.controller('DemoController', function DemoController($scope) {
 
                     for (var i = 0; i != image.length; i++) {
                         formData.append("file", image[i]);
+                    }
+
+                    for (var i = 0; i != qr.length; i++) {
+                        formData.append("WtcFile", qr[i]);
                     }
 
                     formData.append("zonename", values.name);

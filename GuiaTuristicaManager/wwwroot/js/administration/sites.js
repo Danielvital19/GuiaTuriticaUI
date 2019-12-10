@@ -2,7 +2,7 @@
 var sitesZoneName = document.getElementById('sites-zoneName');//sites-zoneName
 var datagirdSites, imageSite, formInstanceSite;
 var placeId;
-
+var multimedia, formInstanceMulti, datagridMedia;
 var store2;
 
 function openSite(id) {
@@ -90,9 +90,9 @@ DemoApp.controller('MasterController', function DemoController($scope) {
                             accept: "image/*",
                             uploadMode: "useForm",
                             onValueChanged: function (e) {
-                                var files = e.value
+                                var files = e.value;
                                 if (files.length > 0) {
-                                    var file = files[0]
+                                    var file = files[0];
                                     fileCach = file;
                                     // Poner la imagen seleccionada en el tag IMG
                                     var reader = new FileReader();
@@ -155,12 +155,72 @@ DemoApp.controller('MasterController', function DemoController($scope) {
     $scope.getDetailGridSettings = function (key) {
         return {
             noDataText: "Aún no hay multimedia en esta sitio, agrega uno.",
-            dataSource: new DevExpress.data.DataSource({
-                store2: new DevExpress.data.ArrayStore({
-                    key: "ID",
-                    data: []
-                }),
-                filter: ["EmployeeID", "=", key]
+            dataSource: store2 = new DevExpress.data.CustomStore({
+                key: "placeId",
+                data: function () {
+
+                },
+                load: function () {
+                    var model;
+                    $.ajax({
+                        url: "Administration/GetModel",
+                        data: { id: 1 },
+                        type: "GET"
+                    }).done(function (response) {
+                        model = response.media;
+                        });
+                    setTimeout(function () {
+                        datagridMedia.option("dataSource", createStore2());
+                    },2000);
+                },
+                insert: function (values) {
+                    var formData = new FormData();
+                    var newName = formInstanceMulti.getEditor('siteName').option('value');
+
+                    for (var i = 0; i !== multimedia.length; i++) {
+                        formData.append("file", multimedia[i]);
+                    }
+
+                    var formato = multimedia[0].name.split(".")[1];
+
+                    if (formato === 'mp4' || formato === 'MP4' || formato === 'AVI' || formato === 'avi')
+                        type = 2;
+                    else if (formato === 'jpg' || formato === 'JPG' || formato === 'gif' || formato === 'GIF' || formato === 'JEPG' || formato === 'jepg' || formato === 'png' || formato === 'PNG')
+                        type = 1;
+                    else
+                        type = 0;
+
+
+                    formData.append("name", newName);
+                    formData.append("text", newName);
+                    formData.append("type", type);
+                    formData.append("modelId", 1);
+
+                    $.ajax({
+                        url: "Administration/PostMedia",
+                        type: "POST",
+                        processData: false,
+                        contentType: false,
+                        data: formData
+                    }).done(function (response) {
+                        datagirdSites.option("dataSource", createStore(idZone));
+                    });
+                },
+                update: function (key, values) {
+                    return sendRequest(URL + "/UpdateOrder", "PUT", {
+                        key: key,
+                        values: JSON.stringify(values)
+                    });
+                },
+                remove: function (key) {
+                    $.ajax({
+                        url: "Administration/DeletePlace",
+                        type: "POST",
+                        data: { id: parseInt(key) }
+                    }).done(function (response) {
+                        store2.push([{ type: "remove", key: key }]);
+                    });
+                }
             }),
             editing: {
                 useIcons: true,
@@ -181,13 +241,10 @@ DemoApp.controller('MasterController', function DemoController($scope) {
                 },
                 form: {
                     onInitialized: function (e) {
-                        formInstanceSite = e.component;
+                        formInstanceMulti = e.component;
                     },
                     formData: siteModel,
                     items: [
-                        {
-                            template: "<img id='picture' height='200px' width='200px'  border='solid 1px' src=''>"
-                        },
                         {
                             dataField: "siteName",
                             label: { text: "Nombre" }
@@ -211,13 +268,13 @@ DemoApp.controller('MasterController', function DemoController($scope) {
                                         // Poner la imagen seleccionada en el tag IMG
                                         var reader = new FileReader();
                                         reader.addEventListener("load", function () {
-                                            var img = document.getElementById('picture');
-                                            img.src = event.target.result;
+                                            //var img = document.getElementById('picture');
+                                            //img.src = event.target.result;
                                         }, false),
                                             function () { console.log = console.log.bind(console); }();
 
                                         reader.readAsDataURL(file);
-                                        imageSite = e.value;
+                                        multimedia = e.value;
                                     }
                                 }
                             }
@@ -227,7 +284,16 @@ DemoApp.controller('MasterController', function DemoController($scope) {
             },
             columnAutoWidth: true,
             showBorders: true,
-            columns: ['Nombre','Tipo']
+            onInitialized: function (e) {
+                datagridMedia = e.component;
+            },
+            columns: [{
+                dataField: "name",
+                caption: "Nombre",
+            }, {
+                    dataField: "type",
+                    caption: "Tipo",
+            }]
         };
     };
 
@@ -446,3 +512,72 @@ function createStore(idZone) {
 }
 
 
+function createStore2(){
+    return store2 = new DevExpress.data.CustomStore({
+        key: "placeId",
+        data: function () {
+
+        },
+        load: function () {
+            var model;
+            $.ajax({
+                url: "Administration/GetModel",
+                data: { id: 1 },
+                type: "GET"
+            }).done(function (response) {
+                model = response.media;
+            });
+            setTimeout(function () {
+                return model;
+            }, 2000);
+        },
+        insert: function (values) {
+            var formData = new FormData();
+            var newName = formInstanceMulti.getEditor('siteName').option('value');
+
+            for (var i = 0; i !== multimedia.length; i++) {
+                formData.append("file", multimedia[i]);
+            }
+
+            var formato = multimedia[0].name.split(".")[1];
+
+            if (formato === 'mp4' || formato === 'MP4' || formato === 'AVI' || formato === 'avi')
+                type = 2;
+            else if (formato === 'jpg' || formato === 'JPG' || formato === 'gif' || formato === 'GIF' || formato === 'JEPG' || formato === 'jepg' || formato === 'png' || formato === 'PNG')
+                type = 1;
+            else
+                type = 0;
+
+
+            formData.append("name", newName);
+            formData.append("text", newName);
+            formData.append("type", type);
+            formData.append("modelId", 1);
+
+            $.ajax({
+                url: "Administration/PostMedia",
+                type: "POST",
+                processData: false,
+                contentType: false,
+                data: formData
+            }).done(function (response) {
+                datagirdSites.option("dataSource", createStore(idZone));
+            });
+        },
+        update: function (key, values) {
+            return sendRequest(URL + "/UpdateOrder", "PUT", {
+                key: key,
+                values: JSON.stringify(values)
+            });
+        },
+        remove: function (key) {
+            $.ajax({
+                url: "Administration/DeletePlace",
+                type: "POST",
+                data: { id: parseInt(key) }
+            }).done(function (response) {
+                store2.push([{ type: "remove", key: key }]);
+            });
+        }
+    });
+}

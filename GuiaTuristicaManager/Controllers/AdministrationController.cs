@@ -369,8 +369,18 @@ namespace GuiaTuristicaManager.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> PostMedia(MediaViewPost Media)
+        public async Task<IActionResult> PostMedia(IFormFile file,int modelId, string name, string text, TypeMedia type )
         {
+            MediaViewPost Media = new MediaViewPost
+            {
+                ModelId = modelId,  
+                Name = name,
+                File = file,
+                Text = text,
+                Type = type
+
+            };
+
             if (Media.ModelId < 1)
             {
                 return BadRequest();
@@ -388,7 +398,7 @@ namespace GuiaTuristicaManager.Controllers
                         return BadRequest("No se publico el archivo multimedia");
                     }
                     var exetension = Path.GetExtension(Media.File.FileName);
-                    if ((exetension == ".mp3" || exetension == ".mp4" || exetension == ".txt"))
+                    if ((exetension == ".jpg" || exetension == ".mp4" || exetension == ".txt"))
                     {
                         if (!Directory.Exists(pathDiretory + pathMedia))
                         {
@@ -397,8 +407,8 @@ namespace GuiaTuristicaManager.Controllers
                         string temppath = string.Empty;
                         switch (Media.Type)
                         {
-                            case TypeMedia.Sound:
-                                temppath = pathMedia + $"{Guid.NewGuid()}_{Media.ModelId}.mp3";
+                            case TypeMedia.Image:
+                                temppath = pathMedia + $"{Guid.NewGuid()}_{Media.ModelId}.jpg";
                                 break;
                             case TypeMedia.Video:
                                 temppath = pathMedia + $"{Guid.NewGuid()}_{Media.ModelId}.mp4";

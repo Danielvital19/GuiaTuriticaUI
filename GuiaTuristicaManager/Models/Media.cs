@@ -17,7 +17,7 @@ namespace GuiaTuristicaManager.Models
     public enum TypeMedia
     {
         Text,
-        Sound,
+        Image,
         Video,
     }
 }

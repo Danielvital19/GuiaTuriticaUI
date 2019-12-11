@@ -259,7 +259,7 @@ DemoApp.controller('MasterController', function DemoController($scope) {
                                 multiple: false,
                                 labelText: "",
                                 uploadUrl: "",
-                                accept: "image/*",
+                                accept: ".jpg, .mp4, .txt",
                                 uploadMode: "useForm",
                                 onValueChanged: function (e) {
                                     var files = e.value

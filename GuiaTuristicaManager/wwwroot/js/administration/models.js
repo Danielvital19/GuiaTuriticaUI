@@ -87,7 +87,7 @@ DemoApp.controller('DemoController', function DemoController($scope) {
                             multiple: false,
                             labelText: "",
                             uploadUrl: "",
-                            accept: "image/*",
+                            accept: ".wtc",
                             uploadMode: "useForm",
                             onValueChanged: function (e) {
                                 var files = e.value

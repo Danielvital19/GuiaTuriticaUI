@@ -5,6 +5,7 @@ var placeId;
 var multimedia, formInstanceMulti, datagridMedia;
 var store2;
 
+
 function openSite(id) {
     openSitePopUp();
 
@@ -140,7 +141,7 @@ DemoApp.controller('MasterController', function DemoController($scope) {
                         $("<div id=model" + e.data.Model.modelId + ">" + e.data.Model.name + "<i onclick= delteModel(" + e.data.Model.modelId + "," + e.data.placeId + ") style='cursor: pointer; margin-left:9px' class='fa fa-trash'></i></div>").appendTo(container);
                     }
                     else {
-                        $("<input type='file' class='custom-file-input' id='customFile" + e.data.placeId + "' name='filename' title='" + e.data.placeId + "'> <label class='custom-file-label' for= 'customFile" + e.data.placeId + "' style='width: 22%; left: 454px'> Choose an fbx file</label >")
+                        $("<input accept='.fbx' type='file' class='custom-file-input' id='customFile" + e.data.placeId + "' name='filename' title='" + e.data.placeId + "'> <label class='custom-file-label' for= 'customFile" + e.data.placeId + "' style='width: 22%; left: 454px'> Choose an fbx file</label >")
                             .appendTo(container);
                     }
                 }
@@ -229,7 +230,7 @@ DemoApp.controller('MasterController', function DemoController($scope) {
                 allowAdding: true,
                 allowDeleting: true,
                 popup: {
-                    title: "Nuevo sitio",
+                    title: "Nuevo archivo multimedia",
                     showTitle: true,
                     width: 700,
                     height: 525,

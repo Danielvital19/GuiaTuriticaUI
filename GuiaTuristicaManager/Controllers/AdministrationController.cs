@@ -40,7 +40,7 @@ namespace GuiaTuristicaManager.Controllers
             pathMedia = "/Media/";
             PathZonesDatabase = "/Zones/";
             PathZoneCover = "/Cover/";
-            pathWtc = "/WtcDataBase";
+            pathWtc = "/WtcDataBase/";
             _logger = logger;
         }
 
@@ -173,7 +173,7 @@ namespace GuiaTuristicaManager.Controllers
                             var temppathwtc = pathWtc + $"{Guid.NewGuid()}.wtc";
                             using (var stream = new FileStream(pathDiretory + temppathwtc, FileMode.Create))
                             {
-                                await Zone.Image.CopyToAsync(stream);
+                                await Zone.WtcFile.CopyToAsync(stream);
                             }
 
                             var zone = new Zone()

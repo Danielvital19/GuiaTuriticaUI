@@ -166,6 +166,35 @@ namespace GuiaTuristicaManager.Controllers
 
         }
 
+        [HttpGet]
+        public async Task<IActionResult> DownloadWTC(int Id)
+        {
+            if (Id < 1)
+                return BadRequest();
+            var zone = await _context.Zones.FindAsync(Id);
+            if (zone != null)
+            {
+                try
+                {
+                    var temppath = pathDiretory + zone.PathWtc;
+                    var memory = new MemoryStream();
+                    using (var stream = new FileStream(temppath, FileMode.Open))
+                    {
+                        await stream.CopyToAsync(memory);
+                    }
+                    memory.Position = 0;
+                    return File(memory, GetMimeType(temppath), Path.GetFileName(temppath));
+                }
+                catch
+                {
+                    return BadRequest("filename not present");
+                }
+            }
+            else
+            {
+                return BadRequest("filename not present");
+            }
+        }
         private string GetMimeType(string fileName)
         {
             var provider = new FileExtensionContentTypeProvider();

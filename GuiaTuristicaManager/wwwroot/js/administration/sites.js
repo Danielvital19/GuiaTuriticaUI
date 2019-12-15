@@ -5,6 +5,8 @@ var placeId;
 var multimedia, formInstanceMulti, datagridMedia;
 var store2;
 
+var medias = [];
+
 
 function openSite(id) {
     openSitePopUp();
@@ -158,21 +160,9 @@ DemoApp.controller('MasterController', function DemoController($scope) {
             noDataText: "Aún no hay multimedia en esta sitio, agrega uno.",
             dataSource: store2 = new DevExpress.data.CustomStore({
                 key: "placeId",
-                data: function () {
-
-                },
+                data: medias,
                 load: function () {
-                    var model;
-                    $.ajax({
-                        url: "Administration/GetModel",
-                        data: { id: 1 },
-                        type: "GET"
-                    }).done(function (response) {
-                        model = response.media;
-                        });
-                    setTimeout(function () {
-                        datagridMedia.option("dataSource", createStore2());
-                    },2000);
+                    return medias.filter(e => e.placeId === key);
                 },
                 insert: function (values) {
                     var formData = new FormData();
@@ -215,7 +205,7 @@ DemoApp.controller('MasterController', function DemoController($scope) {
                 },
                 remove: function (key) {
                     $.ajax({
-                        url: "Administration/DeletePlace",
+                        url: "Administration/DeleteMedia",
                         type: "POST",
                         data: { id: parseInt(key) }
                     }).done(function (response) {
@@ -299,6 +289,7 @@ DemoApp.controller('MasterController', function DemoController($scope) {
     };
 
     $scope.changeSite = function (idZone) {
+        medias = [];
         $.ajax({
             url: "Administration/GetAllPlace",
             data: { id: idZone },
@@ -311,7 +302,14 @@ DemoApp.controller('MasterController', function DemoController($scope) {
                     data: { id: place.placeId },
                     type: "GET"
                 }).done(function (response) {
+
                     place.Model = response;
+
+                    $.each(response.media, function (index, media) {
+                        media.placeId = place.placeId;
+                        media.modelId = response.modelId;
+                        medias.push(media);
+                    });
                 });
             });
 
@@ -362,7 +360,10 @@ DemoApp.controller('MasterController', function DemoController($scope) {
                 });
 
                 datagirdSites.option("dataSource", store2);
-            }, 2000);
+
+
+
+            }, 3000);
         });
     };
 
